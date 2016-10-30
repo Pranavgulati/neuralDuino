@@ -1,6 +1,7 @@
 #ifndef __neuralDuino_h__
 #define __neuralDuino_h__
 #include "settings.h"
+#include "Arduino.h"
 
 /*
 	the neuralDuino lib creates one single perceptron object
@@ -11,14 +12,18 @@
 */
 class neuralDuino{
 private:
-	int synWeight[NUM_SYN];
+	float synWeight[NUM_SYN];
 	int output;
+	float* __input;
 public:
 	/*
 	get the output of the percepron based on the input array
 	*/
-	int getOutput(int input[]);
-
+	int getOutput(float input[]);
+	/*
+	adjust weights according to the update rule 
+	*/
+	void adjustWeights(int desiredOutput,float speed);
 
 };
 
