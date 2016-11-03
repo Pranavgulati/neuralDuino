@@ -16,6 +16,16 @@ void neuralDuino::adjustWeights(int desiredOutput,float speed){
 	Serial.println(error);
 #endif
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = synWeight[i] + (int)(speed * (error * __input[i]));
+		synWeight[i] = synWeight[i] + (float)(speed * (error * __input[i]));
 	}
+}
+
+void neuralDuino::printWeights(){
+
+	for (byte i = 0; i < NUM_SYN; i++){
+		Serial.print(synWeight[i]);
+		Serial.print(",");
+	}
+	Serial.println();
+
 }

@@ -24,7 +24,10 @@ public:
 	adjust weights according to the update rule 
 	*/
 	void adjustWeights(int desiredOutput,float speed);
-
+	/*
+	print the final weights after learning has happened
+	*/
+	void printWeights();
 };
 
 
