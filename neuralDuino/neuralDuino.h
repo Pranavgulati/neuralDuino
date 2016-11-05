@@ -17,6 +17,7 @@ private:
 	float synWeight[NUM_SYN];
 	int output;
 	float input[NUM_SYN];
+
 	byte inCount = 0;
 	neuron* inNodes[NUM_SYN];
 public:
@@ -31,6 +32,8 @@ public:
 	adjust weights according to the update rule 
 	*/
 	void adjustWeights(int desiredOutput,float speed);
+
+	void adjustWeights(int desiredOutput);
 	/*
 	print the final weights after learning has happened
 	*/

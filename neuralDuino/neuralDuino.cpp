@@ -6,7 +6,8 @@ int neuron::setInput(float inputVals[]){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
 	}
-	output = sum;
+
+	output = sigmoid(sum);
 }
 
 int neuron::getOutput(float inputVals[]){
@@ -15,7 +16,7 @@ int neuron::getOutput(float inputVals[]){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
 	}
-	output = sum;
+	output = sigmoid(sum);
 	return sum;
 }
 void neuron::adjustWeights(int desiredOutput, float speed){
@@ -25,6 +26,21 @@ void neuron::adjustWeights(int desiredOutput, float speed){
 #endif
 	for (byte i = 0; i < NUM_SYN; i++){
 		synWeight[i] = synWeight[i] + (float)(speed * (error * input[i]));
+	}
+}
+
+void neuron::adjustWeights(int desiredOutput){
+	int error = desiredOutput - output;
+#ifdef DISPLAY_ERROR
+	Serial.println(error);
+#endif
+	for (byte i = 0; i < NUM_SYN; i++){
+		previouslayererror = previouslayererror + (synWeight[i] * sigmoidDerivative(output) * error);
+	changeinweightof previouslayer = previouslayeroutput *error * sigmoidDerivative(output);
+	newweights = newweights + (speed * deltaweight);
+	}
+	for (byte i = 0; i < NUM_SYN; i++){
+		synWeight[i] = synWeight[i] + (float)(SPEED * (error * input[i]));
 	}
 }
 
@@ -53,7 +69,7 @@ int neuron::getOutput(){
 			sum = sum + (synWeight[i] * inNodes[i]->getOutput());
 		}
 	}
-	return sum;
+	return  sigmoid(sum);;
 
 }
 
