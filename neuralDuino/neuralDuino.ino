@@ -5,7 +5,7 @@ Author:  Pranav
 */
 #include "neuralDuino.h"
 
-neuralDuino node1;
+neuron node1;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
