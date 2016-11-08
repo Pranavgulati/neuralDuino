@@ -17,7 +17,7 @@ private:
 	float synWeight[NUM_SYN];
 	int output;
 	float input[NUM_SYN];
-
+	float desiredOutput;
 	byte inCount = 0;
 	neuron* inNodes[NUM_SYN];
 public:
@@ -25,15 +25,27 @@ public:
 	get the output of the percepron based on the input array
 	*/
 	int getOutput(float input[]);
-
-
+	/*setDeesiredOUtput only valid for the last nodes
+	may require memory optimization
+	too many float calculations consider optimizing /removing these as well
+	*/
+	void setDesiredOutput(float desiredOutput);
+	/*
+	Set the constant input values for the input layer
+	*/
 	int setInput(float input[]);
+	/*
+	Set the constant output value mostly for the bias node only
+	*/
+	int setOutput(int value);
+
+
 	/*
 	adjust weights according to the update rule 
 	*/
 	void adjustWeights(int desiredOutput,float speed);
 
-	void adjustWeights(int desiredOutput);
+	void adjustWeights();
 	/*
 	print the final weights after learning has happened
 	*/
