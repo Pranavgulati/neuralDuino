@@ -10,7 +10,10 @@
 
 	to prevent memory fragmentation memory is NOT dynamically allocated
 	therefore NUM_SYN specifies the no. of synapses to the perceptron
-
+	TODO:
+	- no protection agains unintialized variables and inputs and outputs
+	may require memory optimization
+	too many float calculations consider optimizing /removing these as well
 */
 class neuron{
 private:
@@ -26,8 +29,7 @@ public:
 	*/
 	int getOutput(float input[]);
 	/*setDeesiredOUtput only valid for the last nodes
-	may require memory optimization
-	too many float calculations consider optimizing /removing these as well
+
 	*/
 	void setDesiredOutput(float desiredOutput);
 	/*

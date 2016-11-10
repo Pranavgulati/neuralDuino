@@ -69,7 +69,7 @@ void neuron::adjustWeights(){
 		Serial.println(myError);
 	#endif
 		if (inCount != 0){
-			for (byte i = 0; i < NUM_SYN; i++){
+			for (byte i = 0; i < NUM_SYN && inNodes[i]!=NULL; i++){
 				inNodes[i]->desiredOutput = inNodes[i]->desiredOutput + (synWeight[i] * sigmoidDerivative(output) * myError);
 				//can combine these two statements but this looks much more clear
 				float delta = inNodes[i]->output * myError * sigmoidDerivative(output);
