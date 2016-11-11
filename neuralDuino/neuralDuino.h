@@ -18,16 +18,16 @@
 class neuron{
 private:
 	float synWeight[NUM_SYN];
-	int output;
+	float output;
 	float input[NUM_SYN];
-	float desiredOutput;
 	byte inCount = 0;
-	neuron* inNodes[NUM_SYN];
+	neuron* inNodes[NUM_SYN] ;
 public:
+	float desiredOutput;
 	/*
 	get the output of the percepron based on the input array
 	*/
-	int getOutput(float input[]);
+	float getOutput(float input[]);
 	/*setDeesiredOUtput only valid for the last nodes
 
 	*/
@@ -35,11 +35,11 @@ public:
 	/*
 	Set the constant input values for the input layer
 	*/
-	int setInput(float input[]);
+	void setInput(float input[]);
 	/*
 	Set the constant output value mostly for the bias node only
 	*/
-	int setOutput(int value);
+	void setOutput(int value);
 
 
 	/*
@@ -65,7 +65,7 @@ public:
 	/*
 	get output from the input nodes	
 	*/
-	int getOutput();
+	float getOutput();
 };
 
 

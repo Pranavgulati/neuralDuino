@@ -2,8 +2,8 @@
 #define __settings_h__
 
 #define NUM_SYN 3 //no. of synapses to a perceptron
-#define DISPLAY_ERROR 1
+#define DISPLAY_ERROR 0
 #define LEARNING_RATE 0.1
 #define SPEED LEARNING_RATE
-#define DEBUG 1
+#define DEBUG 0
 #endif

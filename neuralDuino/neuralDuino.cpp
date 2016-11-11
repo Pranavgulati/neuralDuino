@@ -1,21 +1,21 @@
 #include "neuralDuino.h"
 
-int neuron::setInput(float inputVals[]){
-	int sum = 0;
+void neuron::setInput(float inputVals[]){
+	float sum = 0;
 	for (byte i = 0; i < NUM_SYN; i++){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
 	}
-
 	output = sigmoid(sum);
 }
-int neuron::setOutput(int value){
+
+void neuron::setOutput(int value){
 	output = value;
 	inCount = 0;//only to be used for non input nodes like bias
 }
 
-int neuron::getOutput(float inputVals[]){
-	int sum = 0;
+float neuron::getOutput(float inputVals[]){
+	float sum = 0;
 	for (byte i = 0; i < NUM_SYN; i++){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
@@ -24,14 +24,14 @@ int neuron::getOutput(float inputVals[]){
 	return sum;
 }
 
-int neuron::getOutput(){
+float neuron::getOutput(){
 	//this function is called once on the last layer neuron/neurons
 	//therefore the output for each of these is stored inside these neurons
 	//itself for future adjustment of weights
-	int sum = 0;
+	float sum = 0;
 	if (inCount == 0){
-#ifdef DEBUG
-		Serial.println("reached the start nodes");
+#if DEBUG
+		Serial.print("RSN out ");
 #endif
 		//these nodes must be the initial nodes and should have their
 		//constant input specified before this iteration
@@ -43,6 +43,9 @@ int neuron::getOutput(){
 		}
 	}
 	output = sigmoid(sum);
+	#if DEBUG
+		Serial.println(output);
+	#endif
 	return  sigmoid(sum);
 
 }
@@ -50,7 +53,7 @@ int neuron::getOutput(){
 
 void neuron::adjustWeights(int desiredOutput, float speed){
 	int error = desiredOutput - output;
-#ifdef DISPLAY_ERROR
+#if DISPLAY_ERROR
 	Serial.println(error);
 #endif
 	for (byte i = 0; i < NUM_SYN; i++){
@@ -65,10 +68,13 @@ void neuron::setDesiredOutput(float desiredOutput){
 
 void neuron::adjustWeights(){
 	float myError = desiredOutput - output;
-	#ifdef DISPLAY_ERROR
-		Serial.println(myError);
+	#if DISPLAY_ERROR
+		Serial.print(myError);
 	#endif
 		if (inCount != 0){
+			#if DEBUG
+						Serial.println(" AW");
+			#endif
 			for (byte i = 0; i < NUM_SYN && inNodes[i]!=NULL; i++){
 				inNodes[i]->desiredOutput = inNodes[i]->desiredOutput + (synWeight[i] * sigmoidDerivative(output) * myError);
 				//can combine these two statements but this looks much more clear
@@ -78,6 +84,9 @@ void neuron::adjustWeights(){
 			}
 		}
 		else{
+			#if DEBUG
+						Serial.println(" RSN AW");
+			#endif
 			//incount is 0 therfore reached starting nodes or the bias node
 			for (byte i = 0; i < NUM_SYN; i++){
 				float delta = input[i] * myError * sigmoidDerivative(output);
@@ -100,4 +109,5 @@ void neuron::printWeights(){
 
 void neuron::connectInput(neuron* inNode){
 	inNodes[inCount++] = inNode;
+	//Serial.println((int)inNodes[inCount-1]);
 }
