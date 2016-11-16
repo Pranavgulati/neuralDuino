@@ -1,5 +1,15 @@
 #include "neuralDuino.h"
 
+neuron::neuron(){
+	for (byte i = 0; i < NUM_SYN; i++){
+		synWeight[i] = 0;
+		input[i] = 0;
+		inNodes[i] = NULL;
+	}
+	output = 0;
+	inCount = 0;
+}
+
 void neuron::setInput(float inputVals[]){
 	float sum = 0;
 	for (byte i = 0; i < NUM_SYN; i++){
@@ -90,7 +100,7 @@ void neuron::adjustWeights(){
 			//incount is 0 therfore reached starting nodes or the bias node
 			for (byte i = 0; i < NUM_SYN; i++){
 				float delta = input[i] * myError * sigmoidDerivative(output);
-				synWeight[i] = synWeight[i] + (SPEED * delta);
+				synWeight[i] = synWeight[i] + (float)((float)SPEED * delta);
 			}
 		}
 

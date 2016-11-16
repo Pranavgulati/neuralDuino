@@ -2,8 +2,8 @@
 #define __neuralDuino_h__
 #include "settings.h"
 #include "Arduino.h"
-#define sigmoid(x)           (1.0 / (1.0 + (float)exp(-(double)(x))))
-#define sigmoidDerivative(x) ((float)(x)*(1.0-(x))) 
+#define sigmoid(x)           (1.0 / (1.0 + (float)exp(-(float)(x))))
+#define sigmoidDerivative(x) ((float)(sigmoid(x))*(1.0-(sigmoid(x)))) 
 //add the bias support 
 /*
 	the neuralDuino lib creates one single perceptron object
@@ -20,9 +20,10 @@ private:
 	float synWeight[NUM_SYN];
 	float output;
 	float input[NUM_SYN];
-	byte inCount = 0;
+	byte inCount = 0; //input Nodes are only counted 
 	neuron* inNodes[NUM_SYN] ;
 public:
+	neuron();
 	float desiredOutput;
 	/*
 	get the output of the percepron based on the input array

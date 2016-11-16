@@ -24,8 +24,6 @@ void setupNeuralNetwork(){
 	node5.connectInput(&node4);
 
 	//node6 is the bias which is for everyone so
-	node1.connectInput(&node6);
-	node2.connectInput(&node6);
 	node3.connectInput(&node6);
 	node4.connectInput(&node6);
 	node5.connectInput(&node6);
@@ -40,13 +38,14 @@ void setup() {
 	Serial.begin(115200);
 	setupNeuralNetwork();
 	//these are normalized inputs
-	float input[NUM_SYN] = { 0.5, 0.6, 0.8 };
+	float input1[NUM_SYN] = {0.9, 0.8, 0.7 };
+ float input2[NUM_SYN] = { 0.23, -0.45, 0.56 };
     //send the input values to the input nodes
-    node1.setInput(input);
-    node2.setInput(input);
+    node1.setInput(input1);
+    node2.setInput(input2);
     //set the desired output in the result node
     node5.setDesiredOutput(0.9);
-	for (int i = 0; i < 200; i++){
+ for (int i = 0; i < 300; i++){
 
 		//now ask for the output from the output node
 		node5.getOutput();
