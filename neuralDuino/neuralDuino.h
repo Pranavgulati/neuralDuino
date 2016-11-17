@@ -3,7 +3,7 @@
 #include "settings.h"
 #include "Arduino.h"
 #define sigmoid(x)           (1.0 / (1.0 + (float)exp(-(float)(x))))
-#define sigmoidDerivative(x) ((float)(sigmoid(x))*(1.0-(sigmoid(x)))) 
+#define sigmoidDerivative(x) ((float)((x)*(1.0-(x)))) 
 //add the bias support 
 /*
 	the neuralDuino lib creates one single perceptron object

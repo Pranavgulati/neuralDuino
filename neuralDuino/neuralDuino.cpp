@@ -31,7 +31,7 @@ float neuron::getOutput(float inputVals[]){
 		input[i] = inputVals[i]; //copying by value
 	}
 	output = sigmoid(sum);
-	return sum;
+	return output;
 }
 
 float neuron::getOutput(){
@@ -48,7 +48,7 @@ float neuron::getOutput(){
 		return output;
 	}
 	else{
-		for (byte i = 0; i < NUM_SYN && inNodes[i] != NULL; i++){
+		for (byte i = 0; inNodes[i] != NULL; i++){
 			sum = sum + (synWeight[i] * inNodes[i]->getOutput());
 		}
 	}
@@ -85,7 +85,7 @@ void neuron::adjustWeights(){
 			#if DEBUG
 						Serial.println(" AW");
 			#endif
-			for (byte i = 0; i < NUM_SYN && inNodes[i]!=NULL; i++){
+			for (byte i = 0; inNodes[i]!=NULL; i++){
 				inNodes[i]->desiredOutput = inNodes[i]->desiredOutput + (synWeight[i] * sigmoidDerivative(output) * myError);
 				//can combine these two statements but this looks much more clear
 				float delta = inNodes[i]->output * myError * sigmoidDerivative(output);
@@ -98,6 +98,7 @@ void neuron::adjustWeights(){
 						Serial.println(" RSN AW");
 			#endif
 			//incount is 0 therfore reached starting nodes or the bias node
+			//bias node doesnt have any inputs therefore delta for it will be zero
 			for (byte i = 0; i < NUM_SYN; i++){
 				float delta = input[i] * myError * sigmoidDerivative(output);
 				synWeight[i] = synWeight[i] + (float)((float)SPEED * delta);
