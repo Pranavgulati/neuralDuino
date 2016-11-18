@@ -15,7 +15,7 @@
 	may require memory optimization
 	too many float calculations consider optimizing /removing these as well
 */
-typedef float(*activFn)(float,byte);
+typedef float (*activFn)(float,byte);
 class neuron{
 private:
 	float synWeight[NUM_SYN];

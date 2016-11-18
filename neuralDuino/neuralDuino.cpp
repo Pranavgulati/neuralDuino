@@ -2,12 +2,13 @@
 
 neuron::neuron(){
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = (float)analogRead(A0)/8;
+		synWeight[i] = 5;
 		input[i] = 0;
 		inNodes[i] = NULL;
 	}
 	output = 0;
 	inCount = 0;
+
 }
 
 void neuron::setInput(float inputVals[]){
@@ -17,7 +18,7 @@ void neuron::setInput(float inputVals[]){
 		input[i] = inputVals[i]; //copying by value
 	}
 	//input[NUM_SYN - 1] = 1;//addign bias to the input node
-	output = activation(output, LOW);
+	output = activation(sum, LOW);
 }
 
 void neuron::setOutput(int value){
@@ -31,7 +32,7 @@ float neuron::getOutput(float inputVals[]){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
 	}
-	output = activation(output, LOW);
+	output = activation(sum, LOW);
 	return output;
 }
 
@@ -39,11 +40,14 @@ float neuron::getOutput(){
 	//this function is called once on the last layer neuron/neurons
 	//therefore the output for each of these is stored inside these neurons
 	//itself for future adjustment of weights
+	//Serial.print("inCount is  ");
+	//Serial.println(inCount);
+	//Serial.flush();
 	float sum = 0;
 	if (inCount == 0){
-#if DEBUG
-		Serial.print("RSN out ");
-#endif
+		#if DEBUG
+				Serial.print("RSN out ");
+		#endif
 		//these nodes must be the initial nodes and should have their
 		//constant input specified before this iteration
 		return output;
@@ -52,9 +56,9 @@ float neuron::getOutput(){
 		for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
 			sum = sum + (synWeight[i] * inNodes[i]->getOutput());
 		}
+		output = activation(sum, LOW);
 	}
-	
-	output = activation(output, LOW);
+
 	#if DEBUG
 		Serial.println(output);
 	#endif
@@ -101,6 +105,8 @@ void neuron::adjustWeights(){
 			#endif
 			//incount is 0 therfore reached starting nodes or the bias node
 			//bias node doesnt have any inputs therefore delta for it will be zero
+						//###### will not adjust weights for the starting nodes
+						return;
 			for (byte i = 0; i < NUM_SYN; i++){
 				float delta = input[i] * myError * activation(output,HIGH);//high represents true for derivative
 				synWeight[i] = synWeight[i] + (float)((float)SPEED * delta);
@@ -126,5 +132,13 @@ void neuron::connectInput(neuron* inNode){
 }
 
 void neuron::setActivationFn(activFn userFn){
-	activation = userFn;
+	this->activation = userFn;
+
+#if DEBUG
+	//Serial.println((int)&inCount);
+	//Serial.flush();
+	Serial.println((int)this->activation);
+	Serial.println(activation(10, false));
+	Serial.flush();
+#endif
 }
