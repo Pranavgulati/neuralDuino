@@ -2,7 +2,7 @@
 
 neuron::neuron(){
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = 0;
+		synWeight[i] = (float)analogRead(A0)/8;
 		input[i] = 0;
 		inNodes[i] = NULL;
 	}
@@ -16,7 +16,8 @@ void neuron::setInput(float inputVals[]){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
 	}
-	output = sigmoid(sum);
+	//input[NUM_SYN - 1] = 1;//addign bias to the input node
+	output = activation(output, LOW);
 }
 
 void neuron::setOutput(int value){
@@ -30,7 +31,7 @@ float neuron::getOutput(float inputVals[]){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
 	}
-	output = sigmoid(sum);
+	output = activation(output, LOW);
 	return output;
 }
 
@@ -48,15 +49,16 @@ float neuron::getOutput(){
 		return output;
 	}
 	else{
-		for (byte i = 0; inNodes[i] != NULL; i++){
+		for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
 			sum = sum + (synWeight[i] * inNodes[i]->getOutput());
 		}
 	}
-	output = sigmoid(sum);
+	
+	output = activation(output, LOW);
 	#if DEBUG
 		Serial.println(output);
 	#endif
-	return  sigmoid(sum);
+	return  output;
 
 }
 
@@ -85,10 +87,10 @@ void neuron::adjustWeights(){
 			#if DEBUG
 						Serial.println(" AW");
 			#endif
-			for (byte i = 0; inNodes[i]!=NULL; i++){
-				inNodes[i]->desiredOutput = inNodes[i]->desiredOutput + (synWeight[i] * sigmoidDerivative(output) * myError);
+			for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
+				inNodes[i]->desiredOutput = inNodes[i]->desiredOutput + (synWeight[i] * activation(output, HIGH) *myError);
 				//can combine these two statements but this looks much more clear
-				float delta = inNodes[i]->output * myError * sigmoidDerivative(output);
+				float delta = inNodes[i]->output * myError * activation(output, HIGH);
 				synWeight[i] = synWeight[i] + (SPEED * delta);
 				inNodes[i]->adjustWeights();
 			}
@@ -100,7 +102,7 @@ void neuron::adjustWeights(){
 			//incount is 0 therfore reached starting nodes or the bias node
 			//bias node doesnt have any inputs therefore delta for it will be zero
 			for (byte i = 0; i < NUM_SYN; i++){
-				float delta = input[i] * myError * sigmoidDerivative(output);
+				float delta = input[i] * myError * activation(output,HIGH);//high represents true for derivative
 				synWeight[i] = synWeight[i] + (float)((float)SPEED * delta);
 			}
 		}
@@ -121,4 +123,8 @@ void neuron::printWeights(){
 void neuron::connectInput(neuron* inNode){
 	inNodes[inCount++] = inNode;
 	//Serial.println((int)inNodes[inCount-1]);
+}
+
+void neuron::setActivationFn(activFn userFn){
+	activation = userFn;
 }

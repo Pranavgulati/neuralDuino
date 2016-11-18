@@ -15,6 +15,7 @@
 	may require memory optimization
 	too many float calculations consider optimizing /removing these as well
 */
+typedef float(*activFn)(float,byte);
 class neuron{
 private:
 	float synWeight[NUM_SYN];
@@ -22,6 +23,7 @@ private:
 	float input[NUM_SYN];
 	byte inCount = 0; //input Nodes are only counted 
 	neuron* inNodes[NUM_SYN] ;
+	activFn activation;
 public:
 	neuron();
 	float desiredOutput;
@@ -67,6 +69,8 @@ public:
 	get output from the input nodes	
 	*/
 	float getOutput();
+	
+	void setActivationFn(activFn);
 };
 
 
