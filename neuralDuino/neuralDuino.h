@@ -24,9 +24,10 @@ private:
 	byte inCount = 0; //input Nodes are only counted 
 	neuron* inNodes[NUM_SYN] ;
 	activFn activation;
+	float beta;
 public:
 	neuron();
-	float myError;
+
 	/*
 	get the output of the percepron based on the input array
 	*/

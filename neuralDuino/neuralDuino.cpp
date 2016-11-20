@@ -6,6 +6,7 @@ neuron::neuron(){
 		input[i] = 0;
 		inNodes[i] = NULL;
 	}
+	beta = 0;
 	output = 0;
 	inCount = 0;
 
@@ -19,6 +20,7 @@ void neuron::setInput(float inputVals[]){
 	}
 	//input[NUM_SYN - 1] = 1;//addign bias to the input node
 	output = activation(sum, LOW);
+
 }
 
 void neuron::setOutput(int value){
@@ -43,6 +45,7 @@ float neuron::getOutput(){
 	//Serial.print("inCount is  ");
 	//Serial.println(inCount);
 	//Serial.flush();
+	beta = 0;
 	float sum = 0;
 	if (inCount == 0){
 		#if DEBUG
@@ -68,7 +71,8 @@ float neuron::getOutput(){
 
 
 void neuron::adjustWeights(int desiredOutput, float speed){
-	 myError = desiredOutput - output;
+	//remove this asap
+float myError = desiredOutput - output;
 #if DISPLAY_ERROR
 	Serial.println(error);
 #endif
@@ -79,23 +83,31 @@ void neuron::adjustWeights(int desiredOutput, float speed){
 
 
 void neuron::setDesiredOutput(float desiredOutput){
-	myError = desiredOutput - output;
+	beta =  desiredOutput-output;
 }
 
 void neuron::adjustWeights(){
 	#if DISPLAY_ERROR
-		Serial.print(myError);
+		Serial.print(beta);
 	#endif
+		float delta = beta * activation(output, HIGH);
 		if (inCount != 0){
 			#if DEBUG
-						Serial.println(" AW");
+				Serial.println(" AW");
 			#endif
+
 			for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
-				//back propagating the error to previous layer
-				inNodes[i]->myError = inNodes[i]->myError + (synWeight[i] * activation(output, HIGH) *myError);
-				//can combine these two statements but this looks much more clear
-				float delta = inNodes[i]->output * myError * activation(output, HIGH);
-				synWeight[i] = synWeight[i] + (SPEED * delta);
+				//back propagating the delta to previous layer
+				inNodes[i]->beta = inNodes[i]->beta + (synWeight[i] * delta);
+				//the following is correct for the output layer
+				synWeight[i] = synWeight[i] + (SPEED * inNodes[i]->output * delta);
+				//now the value that needs to be backpropogated is 
+				// so inNodes[i]->beta += synWeight[i]*delta; 
+				//by this all the betas reacht the previous layer nodes as summed up
+			}
+			//this is for now only for a single node output layer will implement for multi 
+			//output layers later
+			for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
 				inNodes[i]->adjustWeights();
 			}
 		}
@@ -106,10 +118,8 @@ void neuron::adjustWeights(){
 			//incount is 0 therfore reached starting nodes or the bias node
 			//bias node doesnt have any inputs therefore delta for it will be zero
 						//###### will not adjust weights for the starting nodes
-						
 			for (byte i = 0; i < NUM_SYN; i++){
-				float delta = input[i] * myError * activation(output,HIGH);//high represents true for derivative
-				synWeight[i] = synWeight[i] + (float)((float)SPEED * delta);
+				synWeight[i] = synWeight[i] + (float)((float)SPEED * input[i] * delta);
 			}
 		}
 
