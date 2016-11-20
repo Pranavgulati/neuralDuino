@@ -26,7 +26,7 @@ private:
 	activFn activation;
 public:
 	neuron();
-	float desiredOutput;
+	float myError;
 	/*
 	get the output of the percepron based on the input array
 	*/

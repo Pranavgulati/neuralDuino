@@ -2,7 +2,7 @@
 
 neuron::neuron(){
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = 5;
+		synWeight[i] = 1;
 		input[i] = 0;
 		inNodes[i] = NULL;
 	}
@@ -68,22 +68,21 @@ float neuron::getOutput(){
 
 
 void neuron::adjustWeights(int desiredOutput, float speed){
-	int error = desiredOutput - output;
+	 myError = desiredOutput - output;
 #if DISPLAY_ERROR
 	Serial.println(error);
 #endif
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = synWeight[i] + (float)(speed * (error * input[i]));
+		synWeight[i] = synWeight[i] + (float)(speed * (myError * input[i]));
 	}
 }
 
 
 void neuron::setDesiredOutput(float desiredOutput){
-	this->desiredOutput = desiredOutput;
+	myError = desiredOutput - output;
 }
 
 void neuron::adjustWeights(){
-	float myError = desiredOutput - output;
 	#if DISPLAY_ERROR
 		Serial.print(myError);
 	#endif
@@ -92,7 +91,8 @@ void neuron::adjustWeights(){
 						Serial.println(" AW");
 			#endif
 			for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
-				inNodes[i]->desiredOutput = inNodes[i]->desiredOutput + (synWeight[i] * activation(output, HIGH) *myError);
+				//back propagating the error to previous layer
+				inNodes[i]->myError = inNodes[i]->myError + (synWeight[i] * activation(output, HIGH) *myError);
 				//can combine these two statements but this looks much more clear
 				float delta = inNodes[i]->output * myError * activation(output, HIGH);
 				synWeight[i] = synWeight[i] + (SPEED * delta);
@@ -106,7 +106,7 @@ void neuron::adjustWeights(){
 			//incount is 0 therfore reached starting nodes or the bias node
 			//bias node doesnt have any inputs therefore delta for it will be zero
 						//###### will not adjust weights for the starting nodes
-						return;
+						
 			for (byte i = 0; i < NUM_SYN; i++){
 				float delta = input[i] * myError * activation(output,HIGH);//high represents true for derivative
 				synWeight[i] = synWeight[i] + (float)((float)SPEED * delta);
@@ -124,7 +124,6 @@ void neuron::printWeights(){
 	Serial.println();
 
 }
-
 
 void neuron::connectInput(neuron* inNode){
 	inNodes[inCount++] = inNode;
