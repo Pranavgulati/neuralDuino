@@ -18,16 +18,18 @@
 typedef float (*activFn)(float,byte);
 class neuron{
 private:
+	byte isFinal = 0;
+public:
+	neuron();
 	float synWeight[NUM_SYN];
 	float output;
 	float input[NUM_SYN];
 	byte inCount = 0; //input Nodes are only counted 
-	neuron* inNodes[NUM_SYN] ;
+	neuron* inNodes[NUM_SYN];
 	activFn activation;
 	float beta;
-public:
-	neuron();
 
+	void setFinalNode();
 	/*
 	get the output of the percepron based on the input array
 	*/
