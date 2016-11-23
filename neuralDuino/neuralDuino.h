@@ -28,8 +28,7 @@ public:
 	neuron* inNodes[NUM_SYN];
 	activFn activation;
 	float beta;
-
-	void setFinalNode();
+	void neuron::backpropagate(){
 	/*
 	get the output of the percepron based on the input array
 	*/

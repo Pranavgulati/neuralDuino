@@ -153,7 +153,6 @@ void neuron::adjustWeights(){
 #endif
 		//incount is 0 therfore reached starting nodes or the bias node
 		//bias node doesnt have any inputs therefore delta for it will be zero
-		//###### will not adjust weights for the starting nodes
 		for (byte i = 0; i < NUM_SYN; i++){
 			//TRY A MINUS SIGN HERE TOO
 			synWeight[i] = synWeight[i] + (float)((float)SPEED * input[i] * delta);
@@ -161,6 +160,30 @@ void neuron::adjustWeights(){
 	}
 
 }
+
+/*
+//TRY A MINUS HERE IF IT DOESNT CONVERGE
+synWeight[i] = synWeight[i] + (SPEED * inNodes[i]->output * delta);
+*/
+/*
+this function is called on all those nodes that have an input node
+*/
+void neuron::backpropagate(){
+#if DISPLAY_ERROR
+	Serial.print(beta);
+#endif
+	float delta = beta * activation(output, HIGH);
+
+
+	if (inCount != 0){
+		for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
+			//back propagating the delta to previous layer
+			inNodes[i]->beta = inNodes[i]->beta + (synWeight[i] * delta);
+			//by this all the betas reacht the previous layer nodes as summed up
+		}
+	}
+}
+
 
 void neuron::printWeights(){
 

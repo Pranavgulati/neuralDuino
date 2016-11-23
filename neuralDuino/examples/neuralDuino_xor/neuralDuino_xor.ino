@@ -47,7 +47,7 @@ void setupNeuralNetwork(){
                                   {1, 1,1},
                                   };
 
-void outputLayerAdjustWeights{
+void layerAdjustWeights{
           for (byte i=0;i<NUM_OUT_NODES;i++){
             //depending on all the output nodes call each of their adjust weights
             //for them to set the betas of the preious layers
