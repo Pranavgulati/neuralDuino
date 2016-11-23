@@ -2,7 +2,7 @@
 
 neuron::neuron(){
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = 1;
+		synWeight[i] = 0.5;
 		input[i] = 0;
 		inNodes[i] = NULL;
 	}
@@ -45,7 +45,6 @@ float neuron::getOutput(){
 	//Serial.print("inCount is  ");
 	//Serial.println(inCount);
 	//Serial.flush();
-	beta = 0;
 	float sum = 0;
 	if (inCount == 0){
 		#if DEBUG
@@ -74,7 +73,7 @@ void neuron::adjustWeights(int desiredOutput, float speed){
 	//remove this asap
 float myError = desiredOutput - output;
 #if DISPLAY_ERROR
-	Serial.println(error);
+Serial.println(myError);
 #endif
 	for (byte i = 0; i < NUM_SYN; i++){
 		synWeight[i] = synWeight[i] + (float)(speed * (myError * input[i]));
@@ -123,11 +122,8 @@ void neuron::adjustWeights(){
 		}
 
 }
-void neuron::setFinalNode(){
 
-	isFinal = 1;
-}
-void neuron::adjustWeights(){
+void neuron::adjustWeights(int k){
 
 	//NEWWWW
 
@@ -161,29 +157,50 @@ void neuron::adjustWeights(){
 
 }
 
-/*
-//TRY A MINUS HERE IF IT DOESNT CONVERGE
-synWeight[i] = synWeight[i] + (SPEED * inNodes[i]->output * delta);
-*/
+
 /*
 this function is called on all those nodes that have an input node
 */
 void neuron::backpropagate(){
-#if DISPLAY_ERROR
-	Serial.print(beta);
-#endif
-	float delta = beta * activation(output, HIGH);
 
-
+	float myDelta = beta * activation(output, HIGH);
 	if (inCount != 0){
 		for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
 			//back propagating the delta to previous layer
-			inNodes[i]->beta = inNodes[i]->beta + (synWeight[i] * delta);
+			inNodes[i]->beta = inNodes[i]->beta + (synWeight[i] * myDelta);
 			//by this all the betas reacht the previous layer nodes as summed up
 		}
 	}
+#if DISPLAY_ERROR
+	Serial.print(inCount);
+	Serial.print(" ");
+	Serial.print(beta);
+	Serial.print(" ");
+	Serial.print(output);
+	Serial.println(" ");
+	Serial.flush();
+#endif
 }
-
+/*
+this is called on every node after complete backpropagation is done for all nodes
+*/
+void neuron::adjWeights(){
+	float myDelta = beta * activation(output, HIGH);
+	if (inCount != 0){
+		for (byte i = 0; inNodes[i]!=NULL && i < NUM_SYN; i++){
+			//TRY A MINUS HERE IF IT DOESNT CONVERGE
+			synWeight[i] = synWeight[i] + (SPEED * inNodes[i]->output * myDelta);
+		}
+	}
+	else{
+		for (byte i = 0; i < NUM_SYN; i++){
+			//TRY A MINUS HERE IF IT DOESNT CONVERGE
+			synWeight[i] = synWeight[i] + (SPEED * input[i] * myDelta);
+		}
+	
+	}
+	beta = 0;
+}
 
 void neuron::printWeights(){
 

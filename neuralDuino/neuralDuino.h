@@ -27,8 +27,10 @@ public:
 	byte inCount = 0; //input Nodes are only counted 
 	neuron* inNodes[NUM_SYN];
 	activFn activation;
-	float beta;
-	void neuron::backpropagate(){
+	float beta; //just another backpropagation constant
+
+	void adjWeights();
+	void backpropagate();
 	/*
 	get the output of the percepron based on the input array
 	*/
@@ -51,7 +53,7 @@ public:
 	adjust weights according to the update rule 
 	*/
 	void adjustWeights(int desiredOutput,float speed);
-
+	void adjustWeights(int k);
 	void adjustWeights();
 	/*
 	print the final weights after learning has happened

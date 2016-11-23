@@ -26,14 +26,13 @@ void setupNeuralNetwork(){
 	//node1 and node2 are input  nodes
 	node1.setActivationFn(&sigmoidFn);
   node2.setActivationFn(&sigmoidFn);
-  node3.setActivationFn(&sigmoidFn);
+  node3.setActivationFn(&linear);
   node4.setActivationFn(&sigmoidFn);
  
   node3.connectInput(&node1);
   node3.connectInput(&node2);
 
   node3.connectInput(&node4);
-  node3.setFinalNode();
   //configure bias node as output =1
 	node4.setOutput(1);
 	//the network has been configured 
@@ -47,21 +46,19 @@ void setupNeuralNetwork(){
                                   {1, 1,1},
                                   };
 
-void layerAdjustWeights{
-          for (byte i=0;i<NUM_OUT_NODES;i++){
-            //depending on all the output nodes call each of their adjust weights
-            //for them to set the betas of the preious layers
-               node3.adjustWeights();
-          }
-          
-
-          
+void layerAdjustWeights(){
+  //now the user has to call backpropagate on every 
+//these can be skipped but just for testing
+               node3.adjWeights();
+               node2.adjWeights();
+               node1.adjWeights();
+     
   }
 void learn(){
 //output can never be negative since 
 //it is the output of a sigmoid function
   float output[NUM_SET]  ={0,1,1,0};
-  for(int i=0;i<2000;i++){
+  for(int i=0;i<1000;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes
         node1.setInput(input[k]);
@@ -70,10 +67,18 @@ void learn(){
         //set the desired output in the result node
         node3.getOutput();
         node3.setDesiredOutput(output[k]);
+        for (byte i=0;i<NUM_OUT_NODES;i++){
+            //depending on all the output nodes call each of their adjust weights
+            //for them to set the betas of the preious layers
+               node3.backpropagate();
+               Serial.println("--");
+          }
+               node1.backpropagate();
+               node2.backpropagate();
+               Serial.println("----");
         //now adjust the weights by backpropogating through the network
-        outputLayerAdjustWeights();
-
     } 
+    layerAdjustWeights();
   } 
 }
 
