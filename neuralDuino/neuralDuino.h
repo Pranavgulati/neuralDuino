@@ -17,8 +17,6 @@
 */
 typedef float (*activFn)(float,byte);
 class neuron{
-private:
-	byte isFinal = 0;
 public:
 	neuron();
 	float synWeight[NUM_SYN];
@@ -34,7 +32,7 @@ public:
 	/*
 	get the output of the percepron based on the input array
 	*/
-	float getOutput(float input[]);
+	//float getOutput(float input[]);
 	/*setDeesiredOUtput only valid for the last nodes
 
 	*/
@@ -52,9 +50,11 @@ public:
 	/*
 	adjust weights according to the update rule 
 	*/
+	/*
 	void adjustWeights(int desiredOutput,float speed);
 	void adjustWeights(int k);
 	void adjustWeights();
+	*/
 	/*
 	print the final weights after learning has happened
 	*/
