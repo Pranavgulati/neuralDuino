@@ -1,10 +1,11 @@
 #include "neuralDuino.h"
 
 neuron::neuron(){
+	
 	for (byte i = 0; i < NUM_SYN; i++){
 		input[i] = 0;
 		inNodes[i] = NULL;
-		synWeight[i] = INIT_WEIGHT;
+		synWeight[i] = (float)((float)random(0, 100) / (float)100);
 	}
 	beta = 0;
 	output = 0;
@@ -226,7 +227,11 @@ void neuron::connectInput(neuron* inNode){
 
 void neuron::setActivationFn(activFn userFn){
 	this->activation = userFn;
+	randomSeed(analogRead(A0));
 
+	for (byte i = 0; i < NUM_SYN; i++){
+		synWeight[i] = (float)((float)random(0, 100) / (float)100);
+	}
 #if DEBUG
 	//Serial.println((int)&inCount);
 	//Serial.flush();

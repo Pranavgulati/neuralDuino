@@ -54,7 +54,8 @@ void setupNeuralNetwork(){
 void learn(){
 //output can never be negative since 
 //it is the output of a sigmoid function
-  float output[NUM_SET]  ={0,0,0,1};
+//making the positive set larger forces a greater penalty on the network
+  float output[NUM_SET]  ={0,0,0,5};
   for(int i=0;i<5000;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes

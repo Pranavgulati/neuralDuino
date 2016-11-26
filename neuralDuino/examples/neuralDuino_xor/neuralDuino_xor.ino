@@ -7,7 +7,7 @@ Author:  Pranav
 #define NUM_SET 4
 #define NUM_OUT_NODES 1
 //create the total no. of neurons required in the network including all layers
-neuron node1,node2,node3,node4,node5,node6;
+neuron node1,node2,node3,node4;
 /*
 see the example image for configuration
 this is a user defined function for the user to design and join his own special
@@ -28,46 +28,34 @@ void setupNeuralNetwork(){
   node2.setActivationFn(&sigmoidFn);
   node3.setActivationFn(&linear);
   node4.setActivationFn(&sigmoidFn);
-  node5.setActivationFn(&linear);
-  node6.setActivationFn(&sigmoidFn);
-// 
-//  node5.connectInput(&node3);
-//  node5.connectInput(&node4);
-//  node5.connectInput(&node6);
-//  
-//  node4.connectInput(&node1);
-//  node4.connectInput(&node2);
-//  node4.connectInput(&node6);
-//  
-//  node3.connectInput(&node1);
-//  node3.connectInput(&node2);
-//  node3.connectInput(&node6);
+
   node3.connectInput(&node1);
   node3.connectInput(&node2);
-  node3.connectInput(&node6);
+  node3.connectInput(&node4);
+
   //configure bias node as output =1
-	node6.setOutput(1);
+	node4.setOutput(1);
 	//the network has been configured 
   Serial.println("NN setup done");
 }
    //these are normalized inputs
   float input1[NUM_SET][NUM_SYN] = {
                                   {0, 0,1},
-                                  {0, 0,1},
                                   {1, 0,1},
+                                  {0, 0,1},
                                   {1, 0,1},
                                   };
   float input2[NUM_SET][NUM_SYN] = {
                                   {0, 0,1},
-                                  {1, 0,1},
                                   {0, 0,1},
+                                  {1, 0,1},
                                   {1, 0,1},
                                   };
 void learn(){
 //output can never be negative since 
 //it is the output of a sigmoid function
   float output[NUM_SET]  ={0,1,1,0};
-  for(int i=0;i<1000;i++){
+  for(unsigned int i=0;i<50000;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes
         node1.setInput(input1[k]);
@@ -78,26 +66,20 @@ void learn(){
         node3.setDesiredOutput(output[k]);
             //depending on all the output nodes call each of their adjust weights
             //for them to set the betas of the preious layers
-//               node5.backpropagate();
-//               node4.backpropagate();
+
                node3.backpropagate();
-               
-//               node5.adjWeights();
-//               node4.adjWeights();
+
                node3.adjWeights();
                node2.adjWeights();
                node1.adjWeights();
-
     } 
-
   } 
-
 }
 
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(115200);
-
+Serial.println(millis());
 //  Serial.print("Number of synapses for input = ");
 //  Serial.println(NUM_SYN);
   //the following 2 function calls are user defined as per convenience
@@ -106,10 +88,11 @@ void setup() {
  node1.printWeights();
   node2.printWeights();
   node3.printWeights();
+  delay(500);
   learn();
   Serial.println("learn done");
   Serial.flush();
-
+Serial.println(millis());
 	node1.printWeights();
 	node2.printWeights();
 	node3.printWeights();
