@@ -5,7 +5,8 @@ neuron::neuron(){
 	for (byte i = 0; i < NUM_SYN; i++){
 		input[i] = 0;
 		inNodes[i] = NULL;
-		synWeight[i] = (float)((float)random(0, 100) / (float)100);
+		synWeight[i] = 0;
+		prevDelWeight[i] = 0;
 	}
 	beta = 0;
 	output = 0;
@@ -27,17 +28,7 @@ void neuron::setOutput(int value){
 	output = value;
 	inCount = 0;//only to be used for non input nodes like bias
 }
-/*
-float neuron::getOutput(float inputVals[]){
-	float sum = 0;
-	for (byte i = 0; i < NUM_SYN; i++){
-		sum = sum + (synWeight[i] * inputVals[i]);
-		input[i] = inputVals[i]; //copying by value
-	}
-	output = activation(sum, LOW);
-	return output;
-}
-*/
+
 float neuron::getOutput(){
 	//this function is called once on the last layer neuron/neurons
 	//therefore the output for each of these is stored inside these neurons
@@ -69,99 +60,14 @@ float neuron::getOutput(){
 
 }
 
-/*
-void neuron::adjustWeights(int desiredOutput, float speed){
-	//remove this asap
-float myError = desiredOutput - output;
-#if DISPLAY_ERROR
-Serial.println(myError);
-#endif
-	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = synWeight[i] + (float)(speed * (myError * input[i]));
-	}
-}
-*/
+
 void neuron::setDesiredOutput(float desiredOutput){
 	beta = desiredOutput - output;
 	//Serial.print("inCount SDO is  ");
-	Serial.println((int)(beta*100));
-	Serial.flush();
-}
-/*
-void neuron::adjustWeights(){
-	#if DISPLAY_ERROR
-		Serial.print(beta);
-	#endif
-		float delta = beta * activation(output, HIGH);
-		if (inCount != 0){
-			#if DEBUG
-				Serial.println(" AW");
-			#endif
-
-			for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
-				//back propagating the delta to previous layer
-				inNodes[i]->beta = inNodes[i]->beta + (synWeight[i] * delta);
-				//the following is correct for the output layer
-				synWeight[i] = synWeight[i] + (SPEED * inNodes[i]->output * delta);
-				//now the value that needs to be backpropogated is 
-				// so inNodes[i]->beta += synWeight[i]*delta; 
-				//by this all the betas reacht the previous layer nodes as summed up
-			}
-			//this is for now only for a single node output layer will implement for multi 
-			//output layers later
-			for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
-				inNodes[i]->adjustWeights();
-			}
-		}
-		else{
-			#if DEBUG
-						Serial.println(" RSN AW");
-			#endif
-			//incount is 0 therfore reached starting nodes or the bias node
-			//bias node doesnt have any inputs therefore delta for it will be zero
-						//###### will not adjust weights for the starting nodes
-			for (byte i = 0; i < NUM_SYN; i++){
-				synWeight[i] = synWeight[i] + (float)((float)SPEED * input[i] * delta);
-			}
-		}
-
+//	Serial.println((int)(beta*100));
+	//Serial.flush();
 }
 
-void neuron::adjustWeights(int k){
-
-	//NEWWWW
-
-#if DISPLAY_ERROR
-	Serial.print(beta);
-#endif
-	float delta = beta * activation(output, HIGH);
-	if (inCount != 0){
-		for (byte i = 0; inNodes[i] != NULL && i < NUM_SYN; i++){
-			//back propagating the delta to previous layer
-			inNodes[i]->beta = inNodes[i]->beta + (synWeight[i] * delta);
-			//the following is correct for the output layer
-			//TRY A MINUS HERE IF IT DOESNT CONVERGE
-			synWeight[i] = synWeight[i] + (SPEED * inNodes[i]->output * delta);
-			//now the value that needs to be backpropogated is 
-			// so inNodes[i]->beta += synWeight[i]*delta; 
-			//by this all the betas reacht the previous layer nodes as summed up
-		}
-	}
-	else{
-#if DEBUG
-		Serial.println(" RSN AW");
-#endif
-		//incount is 0 therfore reached starting nodes or the bias node
-		//bias node doesnt have any inputs therefore delta for it will be zero
-		for (byte i = 0; i < NUM_SYN; i++){
-			//TRY A MINUS SIGN HERE TOO
-			synWeight[i] = synWeight[i] + (float)((float)SPEED * input[i] * delta);
-		}
-	}
-
-}
-
-*/
 /*
 this function is called on all those nodes that have an input node
 */
@@ -197,15 +103,21 @@ void neuron::adjWeights(){
 		byte temp = inCount;
 		while (temp--){
 			//TRY A MINUS HERE IF IT DOESNT CONVERGE
-			synWeight[temp] = synWeight[temp] + (SPEED * inNodes[temp]->output * myDelta);
+			float  delWeight = (SPEED * inNodes[temp]->output * myDelta);
+			synWeight[temp] = synWeight[temp] + delWeight + MOMENTUM * prevDelWeight[temp];
+			prevDelWeight[temp] = delWeight;
+			Serial.println(prevDelWeight[temp]);
+			Serial.flush();
 		}
 	}
 	else{
 		for (byte i = 0; i < NUM_SYN; i++){
 			//TRY A MINUS HERE IF IT DOESNT CONVERGE
-			synWeight[i] = synWeight[i] + (SPEED * input[i] * myDelta);
+			float  delWeight = (SPEED * input[i] * myDelta);
+			synWeight[i] = synWeight[i] + delWeight + MOMENTUM * prevDelWeight[i];
+			Serial.println(prevDelWeight[i]);
+			Serial.flush();
 		}
-	
 	}
 	beta = 0;
 }
@@ -228,9 +140,8 @@ void neuron::connectInput(neuron* inNode){
 void neuron::setActivationFn(activFn userFn){
 	this->activation = userFn;
 	randomSeed(analogRead(A0));
-
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = (float)((float)random(0, 100) / (float)100);
+		synWeight[i] = (float)(((float)random(0, 100) / (float)100)-1);
 	}
 #if DEBUG
 	//Serial.println((int)&inCount);

@@ -25,6 +25,7 @@ public:
 	byte inCount = 0; //input Nodes are only counted 
 	neuron* inNodes[NUM_SYN];
 	activFn activation;
+	float prevDelWeight[NUM_SYN];
 	float beta; //just another backpropagation constant
 
 	void adjWeights();
