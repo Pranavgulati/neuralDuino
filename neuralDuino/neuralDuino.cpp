@@ -115,6 +115,7 @@ void neuron::adjWeights(){
 			//TRY A MINUS HERE IF IT DOESNT CONVERGE
 			float  delWeight = (SPEED * input[i] * myDelta);
 			synWeight[i] = synWeight[i] + delWeight + MOMENTUM * prevDelWeight[i];
+			prevDelWeight[i] = delWeight;
 			Serial.println(prevDelWeight[i]);
 			Serial.flush();
 		}

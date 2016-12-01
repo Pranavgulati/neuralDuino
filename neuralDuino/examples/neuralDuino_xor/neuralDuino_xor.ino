@@ -55,7 +55,7 @@ void learn(){
 //output can never be negative since 
 //it is the output of a sigmoid function
   float output[NUM_SET]  ={0,1,1,0};
-  for(unsigned int i=0;i<10000;i++){
+  for(unsigned int i=0;i<500;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes
         node1.setInput(input1[k]);
@@ -66,13 +66,16 @@ void learn(){
         node3.setDesiredOutput(output[k]);
             //depending on all the output nodes call each of their adjust weights
             //for them to set the betas of the preious layers
-
                node3.backpropagate();
-
                node3.adjWeights();
+               Serial.println("-");
+               Serial.flush();
                node2.adjWeights();
+                Serial.println("--");
                node1.adjWeights();
-    } 
+
+    }
+               Serial.println("pol");
   } 
 }
 

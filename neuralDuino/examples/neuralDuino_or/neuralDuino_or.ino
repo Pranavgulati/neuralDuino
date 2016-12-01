@@ -27,7 +27,7 @@ void setupNeuralNetwork(){
 	//node1 and node2 are input  nodes
 	node1.setActivationFn(&sigmoidFn);
   node2.setActivationFn(&sigmoidFn);
-  node3.setActivationFn(&sigmoidFn);
+  node3.setActivationFn(&linear);
   node4.setActivationFn(&sigmoidFn);
 
   node3.connectInput(&node1);
@@ -55,7 +55,7 @@ void learn(){
 //output can never be negative since 
 //it is the output of a sigmoid function
   float output[NUM_SET]  ={0,1,1,1};
-  for(int i=0;i<5000;i++){
+  for(int i=0;i<500;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes
         node1.setInput(input1[k]);
