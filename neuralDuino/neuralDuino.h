@@ -6,36 +6,37 @@
 #define sigmoidDerivative(x) ((float)((x)*(1.0-(x)))) 
 
 /*
-	the neuralDuino lib creates one single perceptron object
-
-	to prevent memory fragmentation memory is NOT dynamically allocated
-	therefore NUM_SYN specifies the no. of synapses to the perceptron
 	TODO:
 	- no protection agains unintialized variables and inputs and outputs
 	may require memory optimization
-	too many float calculations consider optimizing /removing these as well
+	-too many float calculations consider optimizing /removing these as well
+	- do away with NUM_SYN since that only specifies the number of inputs to input nodes
+	- make settings.h a part of main sketch instead of the library
 */
 typedef float (*activFn)(float,byte);
 class neuron{
 public:
 	neuron();
 	float synWeight[NUM_SYN];
-	float output;
-	float input[NUM_SYN];
-	byte inCount = 0; //input Nodes are only counted 
-	neuron* inNodes[NUM_SYN];
-	activFn activation;
 	float prevDelWeight[NUM_SYN];
+	float input[NUM_SYN];
+	neuron* inNodes[NUM_SYN];
+
+	float output;
+	byte inCount = 0; //input Nodes are only counted 
+	activFn activation;
 	float beta; //just another backpropagation constant
 
+	/*
+	adjust weights according to the update rule
+	*/
 	void adjWeights();
+	/*
+	backpropagate the betas to the connected nodes only
+	*/
 	void backpropagate();
 	/*
-	get the output of the percepron based on the input array
-	*/
-	//float getOutput(float input[]);
-	/*setDeesiredOUtput only valid for the last nodes
-
+	setDeesiredOUtput only valid for the last nodes
 	*/
 	void setDesiredOutput(float desiredOutput);
 	/*
@@ -46,26 +47,12 @@ public:
 	Set the constant output value mostly for the bias node only
 	*/
 	void setOutput(int value);
-
-
-	/*
-	adjust weights according to the update rule 
-	*/
-	/*
-	void adjustWeights(int desiredOutput,float speed);
-	void adjustWeights(int k);
-	void adjustWeights();
-	*/
 	/*
 	print the final weights after learning has happened
 	*/
 	void printWeights();
-
 	/*
-	node configuration handler
-	*/
-	/*
-	Add input nodes to this node
+	connect other nodes to this->node as inputs
 	this function accepts one neuron pointer and adds to the
 	list of input pointer from which output is taken as an input for this node
 	*/
@@ -74,7 +61,9 @@ public:
 	get output from the input nodes	
 	*/
 	float getOutput();
-	
+	/*
+	set the activation functionfor this->node
+	*/
 	void setActivationFn(activFn);
 };
 
