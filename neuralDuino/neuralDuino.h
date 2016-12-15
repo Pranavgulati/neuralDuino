@@ -6,15 +6,22 @@
 #define sigmoidDerivative(x) ((float)((x)*(1.0-(x)))) 
 
 /*
+	to prevent fragmentation memory is allocated at construction for NUM_SYN sized arrays
+	it is better since if its made dynamic malloc will happen on the fly that may result 
+	in fragmented RAM memory and since this is intended for low power MCU it is not implemented
+
 	TODO:
 	- no protection agains unintialized variables and inputs and outputs
 	may require memory optimization
 	-too many float calculations consider optimizing /removing these as well
 	- do away with NUM_SYN since that only specifies the number of inputs to input nodes
 	- make settings.h a part of main sketch instead of the library
+	
 */
 typedef float (*activFn)(float,byte);
+
 class neuron{
+
 public:
 	neuron();
 	float synWeight[NUM_SYN];
