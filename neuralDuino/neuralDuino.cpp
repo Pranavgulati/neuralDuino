@@ -106,8 +106,8 @@ void neuron::adjWeights(){
 			float  delWeight = (SPEED * inNodes[temp]->output * myDelta);
 			synWeight[temp] = synWeight[temp] + delWeight + MOMENTUM * prevDelWeight[temp];
 			prevDelWeight[temp] = delWeight;
-			Serial.println(prevDelWeight[temp]);
-			Serial.flush();
+			//Serial.println(prevDelWeight[temp]);
+			//Serial.flush();
 		}
 	}
 	else{
@@ -116,8 +116,8 @@ void neuron::adjWeights(){
 			float  delWeight = (SPEED * input[i] * myDelta);
 			synWeight[i] = synWeight[i] + delWeight + MOMENTUM * prevDelWeight[i];
 			prevDelWeight[i] = delWeight;
-			Serial.println(prevDelWeight[i]);
-			Serial.flush();
+		//	Serial.println(prevDelWeight[i]);
+		//	Serial.flush();
 		}
 	}
 	beta = 0;
