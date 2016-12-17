@@ -19,7 +19,6 @@ void neuron::setInput(float inputVals[]){
 	for (byte i = 0; i < NUM_SYN; i++){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
-
 	}
 	output = activation(sum, LOW);
 }
@@ -116,8 +115,8 @@ void neuron::adjWeights(){
 			float  delWeight = (SPEED * input[i] * myDelta);
 			synWeight[i] = synWeight[i] + delWeight + MOMENTUM * prevDelWeight[i];
 			prevDelWeight[i] = delWeight;
-		//	Serial.println(prevDelWeight[i]);
-		//	Serial.flush();
+			//Serial.println(prevDelWeight[i]);
+			//Serial.flush();
 		}
 	}
 	beta = 0;
@@ -142,7 +141,7 @@ void neuron::setActivationFn(activFn userFn){
 	this->activation = userFn;
 	randomSeed(analogRead(A0));
 	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = (float)(((float)random(0, 100) / (float)100)-1);
+		synWeight[i] = (float)(((float)random(0, 100) / (float)100)-0.2);
 	}
 #if DEBUG
 	//Serial.println((int)&inCount);
