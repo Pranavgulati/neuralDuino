@@ -9,7 +9,7 @@
 #define NUM_OUT_NODES 1
 //create the total no. of neurons required in the network
 //including all layers and one node for bias
-neuron node1,node2,node3,node4;
+neuron node1,node2,node3,node4,node5;
 /*
 this is a user defined function for the user to design and join their own special
 neurons in their own special way
@@ -32,59 +32,60 @@ float linear(float in,byte isDerivative){
   
 void setupNeuralNetwork(){
 	//node1 and node2 are input  nodes
-	node1.setActivationFn(&sigmoidFn);
-  node2.setActivationFn(&sigmoidFn);
-  //node3 is output node
-  node3.setActivationFn(&linear);
-  //node4 is bias node
-  node4.setActivationFn(&sigmoidFn);
+	node1.setActivationFn(&linear);
+  node2.setActivationFn(&linear);
+  //node 3 is hidden layer
+  node3.setActivationFn(&sigmoidFn);
+  //node 4 is output node
+  node4.setActivationFn(&linear);
+  //node5 is bias node
+  node5.setActivationFn(&sigmoidFn);
 
  //making neuron connections
+  node4.connectInput(&node1);
+  node4.connectInput(&node2);
+  node4.connectInput(&node3);
+  node4.connectInput(&node5);
+
   node3.connectInput(&node1);
   node3.connectInput(&node2);
-  node3.connectInput(&node4);
 
   //configure bias node as output = 1
-	node4.setOutput(1);
+	node5.setOutput(1);
 	//the network has been configured 
   Serial.println("NN setup done");
 }
    //these are normalized inputs
   float input1[NUM_SET][NUM_SYN] = {
              //{binary input, dummy input, bias for input nodes}
-                                  {0, 0,1},
-                                  {1, 0,1},
-                                  {0, 0,1},
-                                  {1, 0,1},
+                                  {0, 0,0,0},
+                                  {1, 0,0,0},
+                                  {0, 0,0,0},
+                                  {1, 0,0,0},
                                   };
   float input2[NUM_SET][NUM_SYN] = {
-                                  {0, 0,1},
-                                  {0, 0,1},
-                                  {1, 0,1},
-                                  {1, 0,1},
+                                  {0, 0,0,0},
+                                  {0, 0,0,0},
+                                  {1, 0,0,0},
+                                  {1, 0,0,0},
                                   };
 void learn(){
-//output can never be negative since 
-//it is the output of a sigmoid function
   float output[NUM_SET]  ={0,1,1,0};
-  for(unsigned int i=0;i<500;i++){
+  for(unsigned int i=0;i<5000;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes
         //the input array is of finite length configurable by library header parameter NUM_SYN
-        node1.setInput(input1[k]);
-        node2.setInput(input2[k]);
-              {
+        node1.setOutput(input1[k][0]);
+        node2.setOutput(input2[k][0]);
               //now ask for the output from the output nodes one by one 
               //set the desired output in the output nodes only
               //call backpropagate to bkprpg8 to only 1 level behind the calling nodes
-               node3.getOutput();
-               node3.setDesiredOutput(output[k]);
-               node3.backpropagate();
-              }
+               node4.getOutput();
+               node4.setDesiredOutput(output[k]);
+               node4.backpropagate();
         //call adjustWeights for all nodes after backrprp8n is done for every node
+        node4.adjWeights();
         node3.adjWeights();
-        node2.adjWeights();
-        node1.adjWeights();
     }
   } 
 }
@@ -96,46 +97,43 @@ void setup() {
   Serial.println(NUM_SYN);
 	setupNeuralNetwork();
   //print the inital weights if reqd
-  node1.printWeights();
-  node2.printWeights();
   node3.printWeights();
+  node4.printWeights();
   delay(500);
   learn();
   Serial.println("learn done");
   Serial.flush();
   Serial.println(millis());
-	node1.printWeights();
-	node2.printWeights();
-	node3.printWeights();
-
+  node3.printWeights();
+  node4.printWeights();
 
 //TESTING the learned model
-  node1.setInput(input1[0]);
-  node2.setInput(input2[0]);
+node1.setOutput(input1[0][0]);
+node2.setOutput(input2[0][0]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
- Serial.println(node3.getOutput());
+ Serial.println(node4.getOutput());
   Serial.println("----");
  
-  node1.setInput(input1[1]);
-  node2.setInput(input2[1]);
+node1.setOutput(input1[1][0]);
+node2.setOutput(input2[1][0]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
- Serial.println(node3.getOutput());
+ Serial.println(node4.getOutput());
  Serial.println("----");
 
- node1.setInput(input1[2]);
-  node2.setInput(input2[2]);
+node1.setOutput(input1[2][0]);
+node2.setOutput(input2[2][0]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
- Serial.println(node3.getOutput());
+ Serial.println(node4.getOutput());
  Serial.println("----");
 
- node1.setInput(input1[3]);
-  node2.setInput(input2[3]);
+node1.setOutput(input1[3][0]);
+node2.setOutput(input2[3][0]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
- Serial.println(node3.getOutput());
+ Serial.println(node4.getOutput());
  Serial.println("----");
 
  
