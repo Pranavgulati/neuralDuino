@@ -71,8 +71,8 @@ void setupNeuralNetwork(){
                                   {1, 0,0,0},
                                   };
 void learn(){
-  float output[NUM_SET]  ={0,1,1,0};
-  for(unsigned int i=0;i<5000;i++){
+  float output[NUM_SET]  ={1,1,1,0};
+  for(unsigned int i=0;i<10000;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes
         //the input array is of finite length configurable by library header parameter NUM_SYN
