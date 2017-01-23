@@ -31,7 +31,14 @@ float linear(float in,byte isDerivative){
   }
   
 void setupNeuralNetwork(){
-	//node1 and node2 are input  nodes
+  //no input is given to these neurons,instead their output is directly set
+  node1.begin(0);
+  node2.begin(0);
+  //always include the bias in counting the no. of synapses required
+  node3.begin(3);
+  node4.begin(4);
+  node5.begin(0);
+  //node1 and node2 are input  nodes
 	node1.setActivationFn(&linear);
   node2.setActivationFn(&linear);
   //node 3 is hidden layer
@@ -55,29 +62,20 @@ void setupNeuralNetwork(){
 	node5.setOutput(1);
 	//the network has been configured 
   Serial.println("NN setup done");
+ 
 }
    //these are normalized inputs
-  float input1[NUM_SET][NUM_SYN] = {
-             //{binary input, dummy input, bias for input nodes}
-                                  {0, 0,0,0},
-                                  {1, 0,0,0},
-                                  {0, 0,0,0},
-                                  {1, 0,0,0},
-                                  };
-  float input2[NUM_SET][NUM_SYN] = {
-                                  {0, 0,0,0},
-                                  {0, 0,0,0},
-                                  {1, 0,0,0},
-                                  {1, 0,0,0},
-                                  };
+  float input1[NUM_SET] = {0,1,0,1};
+  float input2[NUM_SET] = {0,0,1,1};
+
 void learn(){
   float output[NUM_SET]  ={0,1,1,0};
-  for(unsigned int i=0;i<5000;i++){
+  for(unsigned int i=0;i<3000;i++){
     for(byte k=0;k<NUM_SET;k++){
         //send the input values to the input nodes
         //the input array is of finite length configurable by library header parameter NUM_SYN
-        node1.setOutput(input1[k][0]);
-        node2.setOutput(input2[k][0]);
+        node1.setOutput(input1[k]);
+        node2.setOutput(input2[k]);
               //now ask for the output from the output nodes one by one 
               //set the desired output in the output nodes only
               //call backpropagate to bkprpg8 to only 1 level behind the calling nodes
@@ -94,8 +92,6 @@ void learn(){
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(115200);
-  Serial.print("Number of synapses for input = ");
-  Serial.println(NUM_SYN);
 	setupNeuralNetwork();
   //print the inital weights if reqd
   node3.printWeights();
@@ -109,29 +105,29 @@ void setup() {
   node4.printWeights();
 
 //TESTING the learned model
-node1.setOutput(input1[0][0]);
-node2.setOutput(input2[0][0]);
+node1.setOutput(input1[0]);
+node2.setOutput(input2[0]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
  Serial.println(node4.getOutput());
   Serial.println("----");
  
-node1.setOutput(input1[1][0]);
-node2.setOutput(input2[1][0]);
+node1.setOutput(input1[1]);
+node2.setOutput(input2[1]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
  Serial.println(node4.getOutput());
  Serial.println("----");
 
-node1.setOutput(input1[2][0]);
-node2.setOutput(input2[2][0]);
+node1.setOutput(input1[2]);
+node2.setOutput(input2[2]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
  Serial.println(node4.getOutput());
  Serial.println("----");
 
-node1.setOutput(input1[3][0]);
-node2.setOutput(input2[3][0]);
+node1.setOutput(input1[3]);
+node2.setOutput(input2[3]);
  Serial.println(node1.getOutput());
  Serial.println(node2.getOutput());
  Serial.println(node4.getOutput());

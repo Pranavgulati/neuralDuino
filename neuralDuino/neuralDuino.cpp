@@ -1,22 +1,37 @@
 #include "neuralDuino.h"
 
 neuron::neuron(){
-	
-	for (byte i = 0; i < NUM_SYN; i++){
-		input[i] = 0;
-		inNodes[i] = NULL;
-		synWeight[i] = 0;
-		prevDelWeight[i] = 0;
-	}
 	beta = 0;
 	output = 0;
 	inCount = 0;
+	input = NULL;
+	inNodes = NULL;
+	synWeight = NULL;
+	prevDelWeight = NULL;
+}
 
+void neuron::begin(byte num_syn){
+	//deallocating previously allocated memory
+	delete input;
+	delete inNodes;
+	delete synWeight;
+	delete prevDelWeight;
+	input = new float[num_syn];//allocating num_syn inputs , generally preferred for input nodes only
+	inNodes = new neuron*[num_syn];
+	synWeight = new float[num_syn];
+	prevDelWeight = new float[num_syn];
+	randomSeed(analogRead(A0));
+	for (byte i = 0; i < num_syn; i++){
+		synWeight[i] = (float)(((float)random(0, 100) / (float)100) - 0.2);
+	}
+	numSynapse = num_syn;
 }
 
 void neuron::setInput(float inputVals[]){
 	float sum = 0;
-	for (byte i = 0; i < NUM_SYN; i++){
+	inCount = 0; //make sure that inCount is marked as zero for inputNodes
+	
+	for (byte i = 0; i < numSynapse; i++){
 		sum = sum + (synWeight[i] * inputVals[i]);
 		input[i] = inputVals[i]; //copying by value
 	}
@@ -36,25 +51,17 @@ float neuron::getOutput(){
 	//Serial.println(inCount);
 	//Serial.flush();
 	float sum = 0;
-	if (inCount == 0){
-		#if DEBUG
-				Serial.print("RSN out ");
-		#endif
-		//these nodes must be the initial nodes and should have their
-		//constant input specified before this iteration
-		return output;
-	}
-	else{
+	if (inCount != 0){
 		byte temp = inCount;
 		while(temp--){
 			sum = sum + (synWeight[temp] * inNodes[temp]->getOutput());
 		}
 		output = activation(sum, LOW);
-	}
+	}	
 
-	#if DEBUG
-		Serial.println(output);
-	#endif
+//		Serial.print((int)this);
+	//	Serial.print("->");
+		//Serial.println(output);
 	return  output;
 
 }
@@ -62,18 +69,15 @@ float neuron::getOutput(){
 
 void neuron::setDesiredOutput(float desiredOutput){
 	beta = desiredOutput - output;
-	//Serial.print("inCount SDO is  ");
-//	Serial.println((int)(beta*100));
-	//Serial.flush();
+#if DISPLAY_ERROR
+	Serial.println((int)(beta*100));
+#endif
 }
 
 /*
 this function is called on all those nodes that have an input node
 */
 void neuron::backpropagate(){
-	//Serial.print("inCount bpo is  ");
-	//Serial.println(inCount);
-	//Serial.flush();
 	float myDelta = beta * activation(output, HIGH);
 	if (inCount != 0){
 		byte temp = inCount;
@@ -83,13 +87,12 @@ void neuron::backpropagate(){
 			//by this all the betas reacht the previous layer nodes as summed up
 		}
 	}
-#if DISPLAY_ERROR
-	Serial.print(inCount);
-	Serial.print(" ");
+#if DEBUG
+	Serial.print((int)this);
+	Serial.print("=this,beta=");
 	Serial.print(beta);
-	Serial.print(" ");
+	Serial.print(",out=");
 	Serial.print(output);
-	Serial.println(" ");
 	Serial.flush();
 #endif
 }
@@ -98,10 +101,9 @@ this is called on every node after complete backpropagation is done for all node
 */
 void neuron::adjWeights(){
 	float myDelta = beta * activation(output, HIGH);
-	if (inCount != 0){
+	if (inCount != 0){ //inNodes is filled up 
 		byte temp = inCount;
 		while (temp--){
-			//TRY A MINUS HERE IF IT DOESNT CONVERGE
 			float  delWeight = (SPEED * inNodes[temp]->output * myDelta);
 			synWeight[temp] = synWeight[temp] + delWeight + MOMENTUM * prevDelWeight[temp];
 			prevDelWeight[temp] = delWeight;
@@ -109,9 +111,8 @@ void neuron::adjWeights(){
 			//Serial.flush();
 		}
 	}
-	else{
-		for (byte i = 0; i < NUM_SYN; i++){
-			//TRY A MINUS HERE IF IT DOESNT CONVERGE
+	else{//inNodes is empty , therfore this is input node
+		for (byte i = 0; i < numSynapse; i++){
 			float  delWeight = (SPEED * input[i] * myDelta);
 			synWeight[i] = synWeight[i] + delWeight + MOMENTUM * prevDelWeight[i];
 			prevDelWeight[i] = delWeight;
@@ -123,8 +124,7 @@ void neuron::adjWeights(){
 }
 
 void neuron::printWeights(){
-
-	for (byte i = 0; i < NUM_SYN; i++){
+	for (byte i = 0; i < numSynapse; i++){
 		Serial.print(synWeight[i]);
 		Serial.print(",");
 	}
@@ -134,20 +134,19 @@ void neuron::printWeights(){
 
 void neuron::connectInput(neuron* inNode){
 	inNodes[inCount++] = inNode;
+#if DEBUG
+	Serial.print((int)this);
+	Serial.print(F(" : connected to :"));
+	Serial.println((int)inNode);
+#endif
 	//Serial.println((int)inNodes[inCount-1]);
 }
 
 void neuron::setActivationFn(activFn userFn){
 	this->activation = userFn;
-	randomSeed(analogRead(A0));
-	for (byte i = 0; i < NUM_SYN; i++){
-		synWeight[i] = (float)(((float)random(0, 100) / (float)100)-0.2);
-	}
+	
 #if DEBUG
-	//Serial.println((int)&inCount);
-	//Serial.flush();
-	Serial.println((int)this->activation);
-	Serial.println(activation(10, false));
-	Serial.flush();
+	Serial.print(F("ActFN is "));
+	Serial.println((int)userFn);
 #endif
 }

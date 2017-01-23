@@ -1,6 +1,13 @@
 #ifndef __neuralDuino_h__
 #define __neuralDuino_h__
-#include "settings.h"
+
+#define DEBUG 0
+#define DISPLAY_ERROR 1
+#define LEARNING_RATE 0.1
+#define MOMENTUM 0.1
+#define SPEED LEARNING_RATE
+
+
 #include "Arduino.h"
 #define sigmoid(x)           (1.0 / (1.0 + (float)exp(-(float)(x))))
 #define sigmoidDerivative(x) ((float)((x)*(1.0-(x)))) 
@@ -24,16 +31,17 @@ class neuron{
 
 public:
 	neuron();
-	float synWeight[NUM_SYN];
-	float prevDelWeight[NUM_SYN];
-	float input[NUM_SYN];
-	neuron* inNodes[NUM_SYN];
-
+	float *synWeight;
+	float *prevDelWeight;
+	float *input;
+	neuron **inNodes; //array of pointers of type neuron
 	float output;
-	byte inCount = 0; //input Nodes are only counted 
+	byte inCount ; //input Nodes are only counted 
+	byte numSynapse;
 	activFn activation;
 	float beta; //just another backpropagation constant
 
+	void begin(byte num_syn);
 	/*
 	adjust weights according to the update rule
 	*/
@@ -71,7 +79,7 @@ public:
 	/*
 	set the activation functionfor this->node
 	*/
-	void setActivationFn(activFn);
+	void setActivationFn(activFn userFn);
 };
 
 

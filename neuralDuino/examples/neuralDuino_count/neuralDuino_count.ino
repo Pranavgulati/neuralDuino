@@ -5,6 +5,7 @@
  * this is user defined and therfore in the main sketch
 */
 #define NUM_SET 4
+#define NUM_SYN 3
 /* this is also user dependent present only for layer Management functions */
 #define NUM_OUT_NODES 1
 //create the total no. of neurons required in the network
@@ -31,6 +32,11 @@ float linear(float in,byte isDerivative){
   }
   
 void setupNeuralNetwork(){
+
+  node1.begin(3);
+  node2.begin(3);
+  node3.begin(3);
+  node4.begin(0);
   //node1 and node2 are input  nodes
   node1.setActivationFn(&sigmoidFn);
   node2.setActivationFn(&sigmoidFn);
@@ -73,14 +79,12 @@ void learn(){
         //the input array is of finite length configurable by library header parameter NUM_SYN
         node1.setInput(input1[k]);
         node2.setInput(input2[k]);
-              {
               //now ask for the output from the output nodes one by one 
               //set the desired output in the output nodes only
               //call backpropagate to bkprpg8 to only 1 level behind the calling nodes
                node3.getOutput();
                node3.setDesiredOutput(output[k]);
                node3.backpropagate();
-              }
         //call adjustWeights for all nodes after backrprp8n is done for every node
         node3.adjWeights();
         node2.adjWeights();
@@ -92,8 +96,6 @@ void learn(){
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(115200);
-  Serial.print("Number of synapses for input = ");
-  Serial.println(NUM_SYN);
   setupNeuralNetwork();
   //print the inital weights if reqd
   node1.printWeights();
