@@ -10,6 +10,11 @@
 //create the total no. of neurons required in the network
 //including all layers and one node for bias
 neuron node1,node2,node3,node4,node5;
+
+   //these are normalized inputs
+  float input1[NUM_SET] = {0,1,0,1};
+  float input2[NUM_SET] = {0,0,1,1};
+  byte isLearned = 10;
 /*
 this is a user defined function for the user to design and join their own special
 neurons in their own special way
@@ -39,7 +44,7 @@ void setupNeuralNetwork(){
   node4.begin(4);
   node5.begin(0);
   //node1 and node2 are input  nodes
-	node1.setActivationFn(&linear);
+  node1.setActivationFn(&linear);
   node2.setActivationFn(&linear);
   //node 3 is hidden layer
   node3.setActivationFn(&sigmoidFn);
@@ -59,14 +64,11 @@ void setupNeuralNetwork(){
   node3.connectInput(&node5);
 
   //configure bias node as output = 1
-	node5.setOutput(1);
-	//the network has been configured 
+  node5.setOutput(1);
+  //the network has been configured 
   Serial.println("NN setup done");
  
 }
-   //these are normalized inputs
-  float input1[NUM_SET] = {0,1,0,1};
-  float input2[NUM_SET] = {0,0,1,1};
 
 void learn(){
   float output[NUM_SET]  ={0,1,1,0};
@@ -80,7 +82,13 @@ void learn(){
               //set the desired output in the output nodes only
               //call backpropagate to bkprpg8 to only 1 level behind the calling nodes
                node4.getOutput();
-               node4.setDesiredOutput(output[k]);
+               if(node4.setDesiredOutput(output[k])==1){
+                  //there is no error in the output of the network
+                  //you should continue NUM_SET times to see if error is
+                  //zero for all cases
+                  //if yes then quit learning
+                  if(isLearned-- == 0 ){return;}
+                  }
                node4.backpropagate();
         //call adjustWeights for all nodes after backrprp8n is done for every node
         node4.adjWeights();
@@ -92,7 +100,7 @@ void learn(){
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(115200);
-	setupNeuralNetwork();
+  setupNeuralNetwork();
   //print the inital weights if reqd
   node3.printWeights();
   node4.printWeights();
@@ -138,5 +146,5 @@ node2.setOutput(input2[3]);
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	delay(2000);
+  delay(2000);
 }
