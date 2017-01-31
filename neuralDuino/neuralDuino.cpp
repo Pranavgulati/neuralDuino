@@ -20,9 +20,11 @@ void neuron::begin(byte num_syn){
 	inNodes = new neuron*[num_syn];
 	synWeight = new float[num_syn];
 	prevDelWeight = new float[num_syn];
+	if (input == NULL || inNodes == NULL || synWeight == NULL || prevDelWeight == NULL){ Serial.println("memAlloc Fail"); while (1); }
 	randomSeed(analogRead(A0));
 	for (byte i = 0; i < num_syn; i++){
 		synWeight[i] = (float)(((float)random(0, 100) / (float)100) - 0.2);
+		prevDelWeight[i] = 0; //important to initialize allocated memory
 	}
 	numSynapse = num_syn;
 }
@@ -73,7 +75,7 @@ byte neuron::setDesiredOutput(float desiredOutput){
 #if DISPLAY_ERROR
 	Serial.println((int)(beta*100));
 #endif
-	return ( beta == 0 ? 1 : 0  ) ;
+	return ((int)(beta * 100) == 0 ? 1 : 0);
 }
 
 /*
@@ -89,6 +91,7 @@ void neuron::backpropagate(){
 			//by this all the betas reacht the previous layer nodes as summed up
 		}
 	}
+
 #if DEBUG
 	Serial.print((int)this);
 	Serial.print("=this,beta=");
@@ -104,6 +107,7 @@ this is called on every node after complete backpropagation is done for all node
 void neuron::adjWeights(){
 	float myDelta = beta * activation(output, HIGH);
 	if (inCount != 0){ //inNodes is filled up 
+
 		byte temp = inCount;
 		while (temp!=0){
 			temp--;
