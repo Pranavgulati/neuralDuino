@@ -53,7 +53,8 @@ float neuron::getOutput(){
 	float sum = 0;
 	if (inCount != 0){
 		byte temp = inCount;
-		while(temp--){
+		while(temp!=0){
+			temp--;
 			sum = sum + (synWeight[temp] * inNodes[temp]->getOutput());
 		}
 		output = activation(sum, LOW);
@@ -67,11 +68,12 @@ float neuron::getOutput(){
 }
 
 
-void neuron::setDesiredOutput(float desiredOutput){
+byte neuron::setDesiredOutput(float desiredOutput){
 	beta = desiredOutput - output;
 #if DISPLAY_ERROR
 	Serial.println((int)(beta*100));
 #endif
+	return ( beta == 0 ? 1 : 0  ) ;
 }
 
 /*
@@ -92,7 +94,7 @@ void neuron::backpropagate(){
 	Serial.print("=this,beta=");
 	Serial.print(beta);
 	Serial.print(",out=");
-	Serial.print(output);
+	Serial.println(output);
 	Serial.flush();
 #endif
 }
@@ -103,7 +105,8 @@ void neuron::adjWeights(){
 	float myDelta = beta * activation(output, HIGH);
 	if (inCount != 0){ //inNodes is filled up 
 		byte temp = inCount;
-		while (temp--){
+		while (temp!=0){
+			temp--;
 			float  delWeight = (SPEED * inNodes[temp]->output * myDelta);
 			synWeight[temp] = synWeight[temp] + delWeight + MOMENTUM * prevDelWeight[temp];
 			prevDelWeight[temp] = delWeight;
@@ -133,7 +136,9 @@ void neuron::printWeights(){
 }
 
 void neuron::connectInput(neuron* inNode){
-	inNodes[inCount++] = inNode;
+
+	inNodes[inCount] = inNode;
+	inCount++;
 #if DEBUG
 	Serial.print((int)this);
 	Serial.print(F(" : connected to :"));
