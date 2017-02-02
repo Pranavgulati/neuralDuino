@@ -10,17 +10,20 @@ neuron::neuron(){
 	prevDelWeight = NULL;
 }
 
-void neuron::begin(byte num_syn){
+void neuron::begin(byte num_syn, byte noConnections = FALSE, byte noInputs = FALSE){
 	//deallocating previously allocated memory
 	delete input;
 	delete inNodes;
 	delete synWeight;
 	delete prevDelWeight;
-	input = new float[num_syn];//allocating num_syn inputs , generally preferred for input nodes only
-	inNodes = new neuron*[num_syn];
-	synWeight = new float[num_syn];
-	prevDelWeight = new float[num_syn];
-	if (input == NULL || inNodes == NULL || synWeight == NULL || prevDelWeight == NULL){ Serial.println("memAlloc Fail"); while (1); }
+	//allocating memory only if requested
+	if (noInputs == FALSE		){	input = new float[num_syn];	   }
+	if (noConnections == FALSE){ inNodes = new neuron*[num_syn]; }
+	if (noConnections == FALSE || noInputs == FALSE){
+		synWeight = new float[num_syn];
+		prevDelWeight = new float[num_syn];
+	}
+	if (input == NULL || inNodes == NULL || synWeight == NULL || prevDelWeight == NULL){ Serial.println(F("memAlloc Fail")); while (1); }
 	randomSeed(analogRead(A0));
 	for (byte i = 0; i < num_syn; i++){
 		synWeight[i] = (float)(((float)random(0, 100) / (float)100) - 0.2);
