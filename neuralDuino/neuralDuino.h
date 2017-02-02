@@ -6,17 +6,28 @@
 #define LEARNING_RATE 0.1
 #define MOMENTUM 0.1
 #define SPEED LEARNING_RATE
-
+#define FALSE LOW
+#define TRUE HIGH
 
 #include "Arduino.h"
 #define sigmoid(x)           (1.0 / (1.0 + (float)exp(-(float)(x))))
 #define sigmoidDerivative(x) ((float)((x)*(1.0-(x)))) 
 
 /*
+	types of neurons can be classified using the 2 begin() parameters noConnections and noInputs
+
+									noConnections	noInputs
+	hybrid (most inefficient)		LOW				LOW			(DEFAULT) //leaves the control to the programmer
+	intermediate neuron				LOW				HIGH
+	bias							HIGH			HIGH
+	input neuron					HIGH			LOW
+
+*/
+
+
+/*
 	TODO:
 	-too many float calculations consider optimizing /removing these as well
-
-	
 */
 typedef float (*activFn)(float,byte);
 
@@ -75,8 +86,15 @@ public:
 	allocates memory one time only, while it is possible to do away with this
 	and have completely dynamic allocn and reallocn but it is not advisable because the RAM may get
 	fragmented
+
+	ARGs:
+	noConnections : implies that this neuron will not have any connections coming into it
+                    when noConnections = HIGH, this doesnt allocate memory for the same
+	noInputs	  : implies that this neuron will not have any float inputs coming into it from the user
+                    when noInputs = HIGH, this doesnt allocate memory for the same
+	these are optional arguments for those people who know what they are doing 
 	*/
-	void begin(byte num_syn=0);
+	void begin(byte num_syn, byte noConnections = FALSE, byte noInputs = FALSE);
 	/*
 	adjust weights according to the update rule
 	*/
