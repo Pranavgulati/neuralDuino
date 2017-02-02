@@ -16,6 +16,11 @@ void neuron::begin(byte num_syn, byte noConnections = FALSE, byte noInputs = FAL
 	delete inNodes;
 	delete synWeight;
 	delete prevDelWeight;
+	numSynapse = num_syn;
+	if (num_syn == 0){
+		// since no memory is requested just return
+		return;
+	}
 	//allocating memory only if requested
 	if (noInputs == FALSE		){	input = new float[num_syn];	   }
 	if (noConnections == FALSE){ inNodes = new neuron*[num_syn]; }
@@ -29,7 +34,6 @@ void neuron::begin(byte num_syn, byte noConnections = FALSE, byte noInputs = FAL
 		synWeight[i] = (float)(((float)random(0, 100) / (float)100) - 0.2);
 		prevDelWeight[i] = 0; //important to initialize allocated memory
 	}
-	numSynapse = num_syn;
 }
 
 void neuron::setInput(float inputVals[]){
