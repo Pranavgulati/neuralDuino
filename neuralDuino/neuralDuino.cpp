@@ -28,7 +28,6 @@ void neuron::begin(byte num_syn, byte noConnections = FALSE, byte noInputs = FAL
 		synWeight = new float[num_syn];
 		prevDelWeight = new float[num_syn];
 	}
-	if (input == NULL || inNodes == NULL || synWeight == NULL || prevDelWeight == NULL){ Serial.println(F("memAlloc Fail")); while (1); }
 	randomSeed(analogRead(A0));
 	for (byte i = 0; i < num_syn; i++){
 		synWeight[i] = (float)(((float)random(0, 100) / (float)100) - 0.2);
