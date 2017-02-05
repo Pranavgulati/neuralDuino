@@ -111,6 +111,7 @@ public:
 	Set the constant input values for the input layer
 	*/
 	void setInput(float input[]);
+	void setInput(int input[]);
 	/*
 	Set the constant output value mostly for the bias node only
 	*/
