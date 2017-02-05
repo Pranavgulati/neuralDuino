@@ -46,6 +46,17 @@ void neuron::setInput(float inputVals[]){
 	output = activation(sum, LOW);
 }
 
+void neuron::setInput(int inputVals[]){
+	float sum = 0;
+	inCount = 0; //make sure that inCount is marked as zero for inputNodes
+
+	for (byte i = 0; i < numSynapse; i++){
+		sum = sum + (synWeight[i] * inputVals[i]);
+		input[i] = inputVals[i]; //copying by value
+	}
+	output = activation(sum, LOW);
+}
+
 void neuron::setOutput(int value){
 	output = value;
 	inCount = 0;//only to be used for non input nodes like bias
@@ -98,14 +109,6 @@ void neuron::backpropagate(){
 		}
 	}
 
-#if DEBUG
-	Serial.print((int)this);
-	Serial.print("=this,beta=");
-	Serial.print(beta);
-	Serial.print(",out=");
-	Serial.println(output);
-	Serial.flush();
-#endif
 }
 /*
 this is called on every node after complete backpropagation is done for all nodes
@@ -113,11 +116,10 @@ this is called on every node after complete backpropagation is done for all node
 void neuron::adjWeights(){
 	float myDelta = beta * activation(output, HIGH);
 	if (inCount != 0){ //inNodes is filled up 
-
 		byte temp = inCount;
 		while (temp!=0){
 			temp--;
-			float  delWeight = (SPEED * inNodes[temp]->output * myDelta);
+			float delWeight = (SPEED * inNodes[temp]->output * myDelta);
 			synWeight[temp] = synWeight[temp] + delWeight + MOMENTUM * prevDelWeight[temp];
 			prevDelWeight[temp] = delWeight;
 			//Serial.println(prevDelWeight[temp]);
@@ -133,6 +135,14 @@ void neuron::adjWeights(){
 			//Serial.flush();
 		}
 	}
+#if DEBUG
+	Serial.print((int)this);
+	Serial.print("=this,beta=");
+	Serial.print(beta);
+	Serial.print(",out=");
+	Serial.println(output);
+	Serial.flush();
+#endif
 	beta = 0;
 }
 
