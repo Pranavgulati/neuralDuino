@@ -1,17 +1,20 @@
 #ifndef __neuralDuino_h__
 #define __neuralDuino_h__
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <Arduino.h> // remove this for other platforms and remove all references to ( Serial, analogRead(A0))
+
 #define DEBUG 0
 #define DISPLAY_ERROR 1
 #define LEARNING_RATE 0.1
 #define MOMENTUM 0.1
 #define SPEED LEARNING_RATE
-#define FALSE LOW
-#define TRUE HIGH
-
-#include "Arduino.h"
+#define FALSE 0
+#define TRUE 1
 #define sigmoid(x)           (1.0 / (1.0 + (float)exp(-(float)(x))))
 #define sigmoidDerivative(x) ((float)((x)*(1.0-(x)))) 
+#define NULL __null //standard definition
 
 /*
 	types of neurons can be classified using the 2 begin() parameters noConnections and noInputs
@@ -29,7 +32,7 @@
 	TODO:
 	-too many float calculations consider optimizing /removing these as well
 */
-typedef float (*activFn)(float,byte);
+typedef float (*activFn)(float,uint8_t);
 
 class neuron{
 
@@ -67,12 +70,12 @@ public:
 	be advised this DOES NOT keep count of the inputs specified
 	by the programmer by the setInput() function
 	*/
-	byte inCount ; //input Nodes are only counted 
+	uint8_t inCount ; //input Nodes are only counted 
 	/*
 	keeps count of the inputs specified by setInput() and begin()
 	this counts the number of float array type inputs and not the connectInput() ones
 	*/
-	byte numSynapse;
+	uint8_t numSynapse;
 	/*
 	associates an activation function for this neuron, user sets the address of any activation 
 	function using setActivationFn()
@@ -94,7 +97,7 @@ public:
                     when noInputs = HIGH, this doesnt allocate memory for the same
 	these are optional arguments for those people who know what they are doing 
 	*/
-	void begin(byte num_syn, byte noConnections = FALSE, byte noInputs = FALSE);
+	void begin(uint8_t num_syn, uint8_t noConnections = FALSE, uint8_t noInputs = FALSE);
 	/*
 	adjust weights according to the update rule
 	*/
@@ -106,7 +109,7 @@ public:
 	/*
 	setDesiredOUtput only valid for the last nodes
 	*/
-	byte setDesiredOutput(float desiredOutput);
+	uint8_t setDesiredOutput(float desiredOutput);
 	/*
 	Set the constant input values for the input layer
 	*/
